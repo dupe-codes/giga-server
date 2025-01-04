@@ -37,7 +37,7 @@
   },
   "scripts": {
     "build:server": "tsc",
-    "build:client": "vite build --watch",
+    "build:client": "vite build",
     "build:artifacts": "./scripts/build.sh",
     "build": "yarn build:server && yarn build:client && yarn build:artifacts",
     "dev-client": "vite",

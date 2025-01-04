@@ -10,6 +10,7 @@ import { load } from "js-yaml";
 
 interface Config {
   drawings_dir: string;
+  saved_drawings_ext: string;
 }
 
 export function expand_env_vars(str: string): string {
@@ -55,7 +56,7 @@ router.post("/drawing", (req: Request, res: Response) => {
   const payload = req.body as DrawingPOSTRequest;
   const save_file = path.join(
     expand_env_vars(config_data.drawings_dir),
-    payload["name"] + ".giga",
+    payload["name"] + config_data.saved_drawings_ext,
   );
   console.log(`Saving drawing to ${save_file}`);
   writeFileSync(save_file, JSON.stringify(payload["drawing"]));
