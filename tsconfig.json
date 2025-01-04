@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",
+    "module": "Node16",
     "outDir": "dist/js",
     "rootDir": "src",
+    "jsx": "react-jsx",
+    "moduleResolution": "node16",
+    "sourceMap": true,
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],
-  "exclude": ["src/app", "src/types/*", "node_modules"]
+  "exclude": ["node_modules"]
 }

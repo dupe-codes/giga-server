@@ -7,8 +7,10 @@
   "author": "dupe",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "js-yaml": "^4.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",
@@ -18,6 +20,9 @@
     "@eslint/js": "^9.17.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash.throttle": "^4.1.9",
+    "@types/lodash.uniq": "^4.5.9",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
@@ -32,9 +37,12 @@
   },
   "scripts": {
     "build:server": "tsc",
-    "build:client": "vite build",
-    "build": "yarn build:server && yarn build:client",
+    "build:client": "vite build --watch",
+    "build:artifacts": "./scripts/build.sh",
+    "build": "yarn build:server && yarn build:client && yarn build:artifacts",
     "dev-client": "vite",
-    "start": "concurrently \"tsc --jsx react -w\" \"nodemon dist/js/server.js\""
+    "format": "./node_modules/prettier/bin/prettier.cjs -w src/*",
+    "lint": "./node_modules/eslint/bin/eslint.js src/*",
+    "start": "concurrently \"tsc -w\" \"vite build --watch\" \"nodemon --inspect dist/js/server.js\""
   }
 }

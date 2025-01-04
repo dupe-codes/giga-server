@@ -1,7 +1,7 @@
-import { React, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import {
-  TLEditorSnapshot,
   Tldraw,
+  TLStoreSnapshot,
   getSnapshot,
   loadSnapshot,
   useEditor,
@@ -14,15 +14,43 @@ import "tldraw/tldraw.css";
 function SnapshotToolbar() {
   const editor = useEditor();
 
-  const save = useCallback(() => {
+  const save = useCallback(async () => {
+    const drawing_name = prompt("Enter a name for the drawing:");
     const { document, session } = getSnapshot(editor.store);
-    localStorage.setItem("snapshot", JSON.stringify({ document, session }));
+
+    const payload = {
+      name: drawing_name,
+      drawing: {
+        document,
+        session,
+      },
+    };
+
+    try {
+      const response = await fetch("/drawing", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Save request failed with error code: ${response.status}`,
+        );
+      }
+
+      setShowCheckMark(true);
+    } catch (error) {
+      console.error("Failed to save drawing: ", error);
+    }
   }, [editor]);
 
   const load = useCallback(() => {
     const snapshot = localStorage.getItem("snapshot");
     if (!snapshot) return;
-    loadSnapshot(editor.store, JSON.parse(snapshot));
+    loadSnapshot(editor.store, JSON.parse(snapshot) as TLStoreSnapshot);
   }, [editor]);
 
   const [showCheckMark, setShowCheckMark] = useState(false);
@@ -68,9 +96,7 @@ function SnapshotToolbar() {
   );
 }
 
-type Props = {};
-
-const Drawing: React.FC<Props> = ({}) => {
+const Drawing: FC<object> = () => {
   return (
     <div style={{ position: "fixed", inset: 0 }}>
       <Tldraw
