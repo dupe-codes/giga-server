@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Drawing from './components/tldraw'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Drawing from "./components/tldraw";
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
         <Route path="/draw" element={<Drawing />} />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;

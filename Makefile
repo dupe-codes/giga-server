@@ -1,10 +1,10 @@
 .PHONY: format
 format: ## Format code source files with prettier
-	./node_modules/prettier/bin/prettier.cjs -w src/**/*
+	./node_modules/prettier/bin/prettier.cjs -w src/*
 
 .PHONY: lint
 lint: ## Lint code source files
-	./node_modules/eslint/bin/eslint.js
+	./node_modules/eslint/bin/eslint.js src/*
 
 .PHONY: run
 run: ## Run the main application server
