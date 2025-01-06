@@ -3,7 +3,7 @@ import cors from "cors";
 import express, { Express, Router, Response, Request } from "express";
 import path from "path";
 
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, readdirSync } from "fs";
 import { load } from "js-yaml";
 
 // TODO: set up logging to log dir and file
@@ -26,8 +26,11 @@ function read_config_file(): Config {
   } catch (error) {
     console.error(`Failed to load config file at ${config_file_path}`, error);
     console.warn("Using default configuration");
+
     const default_config = path.join(__dirname, "config.yml");
-    return load(readFileSync(default_config, "utf8")) as Config;
+    const config = load(readFileSync(default_config, "utf8")) as Config;
+    config.drawings_dir = expand_env_vars(config.drawings_dir);
+    return config;
   }
 }
 
@@ -47,20 +50,70 @@ const router: Router = Router();
  * Drawing routes
  */
 
+function get_saved_drawings(config: Config): Array<string> {
+  const files = readdirSync(config.drawings_dir);
+  return files.map((file) => file.replace(config.saved_drawings_ext, ""));
+}
+
+const saved_drawings = get_saved_drawings(config_data);
+
+interface DrawingData {
+  document: JSON;
+  session: JSON;
+}
+
 interface DrawingPOSTRequest {
   name: string;
-  drawing: JSON;
+  drawing: DrawingData;
+}
+
+interface GetAllDrawingsResponse {
+  drawings: Array<string>;
+}
+
+interface GetDrawingResponse {
+  name: string;
+  drawing: DrawingData;
 }
 
 router.post("/drawing", (req: Request, res: Response) => {
   const payload = req.body as DrawingPOSTRequest;
   const save_file = path.join(
-    expand_env_vars(config_data.drawings_dir),
+    config_data.drawings_dir,
     payload["name"] + config_data.saved_drawings_ext,
   );
   console.log(`Saving drawing to ${save_file}`);
   writeFileSync(save_file, JSON.stringify(payload["drawing"]));
   res.status(200).json({ message: "looks good!" });
+});
+
+router.get("/drawing/:file_name", (req: Request, res: Response) => {
+  const file_name = req.params["file_name"];
+
+  if (!saved_drawings.includes(file_name)) {
+    res.status(404).json({ message: "That file doesn't exist!" });
+    return;
+  }
+
+  const saved_file = path.join(
+    config_data.drawings_dir,
+    file_name + config_data.saved_drawings_ext,
+  );
+
+  const file_data = readFileSync(saved_file, "utf8");
+  const json_response = {
+    name: file_name,
+    drawing: JSON.parse(file_data) as DrawingData,
+  } as GetDrawingResponse;
+
+  res.status(200).json(json_response);
+});
+
+router.get("/drawing", (_: Request, res: Response) => {
+  const json_response = {
+    drawings: saved_drawings,
+  } as GetAllDrawingsResponse;
+  res.status(200).json(json_response);
 });
 
 /*
