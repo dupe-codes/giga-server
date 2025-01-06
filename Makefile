@@ -38,6 +38,10 @@ run-server: build-server build-artifacts ## Run the express server only
 run: build-artifacts ## Run the full server and client application stack
 	concurrently "tsc -w" "vite build --watch" "nodemon --inspect dist/js/server.js"
 
+.PHONY: deploy
+deploy: ## Build a docker image for deployment
+	docker build -t giga-server:latest .
+
 .PHONY: help
 help: ## Show this help
 	@grep -E '^[a-z.A-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

@@ -1,2 +1,3 @@
-drawings_dir: "$HOME/projects/giga-server/test"
+drawings_dir: "$PWD/drawings"
 saved_drawings_ext: ".giga"
+logs_file: "$PWD/logs/giga-server.log"

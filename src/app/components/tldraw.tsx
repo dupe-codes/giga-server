@@ -8,12 +8,20 @@ import {
 } from "tldraw";
 import "tldraw/tldraw.css";
 
-// TODO: update component to ask for snapshot file name and POST to server to save
-//       if already saved as snapshot, autopopulate file name as the existing
-//       also get list of existing snapshots from server, show in dropdown to load
+interface DrawingData {
+  document: JSON;
+  session: JSON;
+}
+
+interface GetDrawingResponse {
+  name: string;
+  drawing: DrawingData;
+}
+
 function SnapshotToolbar() {
   const editor = useEditor();
 
+  // --- SAVE ---
   const save = useCallback(async () => {
     const drawing_name = prompt("Enter a name for the drawing:");
     const { document, session } = getSnapshot(editor.store);
@@ -47,10 +55,42 @@ function SnapshotToolbar() {
     }
   }, [editor]);
 
-  const load = useCallback(() => {
-    const snapshot = localStorage.getItem("snapshot");
-    if (!snapshot) return;
-    loadSnapshot(editor.store, JSON.parse(snapshot) as TLStoreSnapshot);
+  const load = useCallback(async () => {
+    try {
+      const response = await fetch("/drawing");
+      if (!response.ok) {
+        throw new Error(`GET /drawing failed with status: ${response.status}`);
+      }
+
+      const data = (await response.json()) as { drawings: string[] };
+      if (!data.drawings || data.drawings.length === 0) {
+        alert("No drawings found!");
+        return;
+      }
+      const drawings = data.drawings;
+
+      const choice = prompt(
+        `Available drawings:\n${drawings.join("\n")}\n\nPlease type one exactly:`,
+      );
+      if (!choice) return;
+      console.log("User chose:", choice);
+
+      const drawingResponse = await fetch(`/drawing/${choice}`);
+      if (!drawingResponse.ok) {
+        throw new Error(
+          `GET /drawings/${choice} failed with status: ${drawingResponse.status}`,
+        );
+      }
+
+      const drawingData = (await drawingResponse.json()) as GetDrawingResponse;
+      console.log("Loaded drawing:", drawingData.name);
+
+      const snapshot = drawingData.drawing;
+      console.log("Drawing data:", snapshot);
+      loadSnapshot(editor.store, snapshot as unknown as TLStoreSnapshot);
+    } catch (error) {
+      console.error("Failed to load drawings: ", error);
+    }
   }, [editor]);
 
   const [showCheckMark, setShowCheckMark] = useState(false);

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO: add watch functionality
+
 SRC_DIR=src/
 OUT_DIR=dist/js/
 
