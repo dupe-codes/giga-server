@@ -9,8 +9,5 @@ RUN yarn install
 COPY . .
 RUN yarn build
 
-RUN mkdir -p drawings
-RUN mkdir -p logs
-
 EXPOSE 4000
 CMD ["node", "dist/js/server.js"]
