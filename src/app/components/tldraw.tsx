@@ -133,9 +133,9 @@ function SnapshotToolbar() {
           setShowCheckMark(true);
         }}
       >
-        Save Snapshot
+        Save drawing
       </button>
-      <button onClick={load}>Load Snapshot</button>
+      <button onClick={load}>Load drawing</button>
     </div>
   );
 }
