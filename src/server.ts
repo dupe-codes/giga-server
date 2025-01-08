@@ -7,6 +7,8 @@ import * as winston from "winston";
 import { readFileSync, writeFileSync, readdirSync } from "fs";
 import { load } from "js-yaml";
 
+// --- SERVER CONFIGURATION ---
+
 interface Config {
   drawings_dir: string;
   saved_drawings_ext: string;
@@ -63,9 +65,7 @@ server.use(express.static(path.join(__dirname, "../client")));
 
 const router: Router = Router();
 
-/*
- * Drawing routes
- */
+// -- DRAWING ROUTES --
 
 function get_saved_drawings(config: Config): Array<string> {
   const files = readdirSync(config.drawings_dir);
@@ -136,15 +136,15 @@ router.get("/drawing/:file_name", (req: Request, res: Response) => {
   res.status(200).json(json_response);
 });
 
-/*
- * Catch all route to serve client application
- */
+// --- CLIENT APPLICATION SERVING --
+
 router.get("*", (_: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "../client", "index.html"));
 });
 
-server.use(router);
+// --- LAUNCH SERVER ---
 
+server.use(router);
 server.listen(PORT, () =>
   LOGGER.info(`Server running on http://localhost:${PORT}`),
 );

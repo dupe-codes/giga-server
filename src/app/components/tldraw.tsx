@@ -8,6 +8,8 @@ import {
 } from "tldraw";
 import "tldraw/tldraw.css";
 
+// TODO: Figure out how to share types between server and client
+
 interface DrawingData {
   document: JSON;
   session: JSON;
@@ -55,6 +57,7 @@ function SnapshotToolbar() {
     }
   }, [editor]);
 
+  // --- LOAD ---
   const load = useCallback(async () => {
     try {
       const response = await fetch("/drawing");
@@ -93,6 +96,7 @@ function SnapshotToolbar() {
     }
   }, [editor]);
 
+  // --- CHECKMARK STATE ---
   const [showCheckMark, setShowCheckMark] = useState(false);
   useEffect(() => {
     if (showCheckMark) {
