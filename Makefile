@@ -1,23 +1,18 @@
-SHELL := /bin/bash
-
-PATH := $(CURDIR)/node_modules/.bin:$(PATH)
-export PATH
-
 .PHONY: format
 format:	## Format all typescript source files
-	prettier -w src/*
+	npx prettier -w src/*
 
 .PHONY: lint
 lint: ## Lint all typescript source files
-	eslint src/*
+	npx eslint src/*
 
 .PHONY: build-server
 build-server: ## Build the node.js server only
-	tsc
+	npx tsc
 
 .PHONY: build-client
 build-client: ## Build the react client app only
-	vite build
+	npx vite build
 
 .PHONY: build-artifacts
 build-artifacts: ## Prepare additional artifacts for use
@@ -29,14 +24,14 @@ build: build-server build-client build-artifacts ## Build the full stack
 
 .PHONY: run-client
 run-client: build-client build-artifacts ## Run the client application only
-	vite
+	npx vite
 
 run-server: build-server build-artifacts ## Run the express server only
-	nodemon --inspect dist/js/server.js
+	npx nodemon --inspect dist/js/server.js
 
 .PHONY: run
 run: build-artifacts ## Run the full server and client application stack
-	concurrently "tsc -w" "vite build --watch" "nodemon --inspect dist/js/server.js"
+	npx concurrently "tsc -w" "vite build --watch" "nodemon --inspect dist/js/server.js"
 
 .PHONY: deploy
 deploy: ## Build a docker image for deployment
